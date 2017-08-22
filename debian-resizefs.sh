@@ -48,6 +48,10 @@ case "$1" in
         ;;
 esac
 
+/sbin/vgchange -ay
+/bin/ln -s /proc/mounts /etc/mtab
+ROOT="/dev/mapper/pve-root"
+
 /sbin/e2fsck -f "$ROOT" || echo "e2fsck: $?"
 # Size in filesystem blocks, usually 4 KB
 # tune2fs -l /dev/vda1
