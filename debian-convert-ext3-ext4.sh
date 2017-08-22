@@ -4,7 +4,7 @@
 #
 
 # Check current filesystem type
-ROOT_FS_TYPE="$(sed -n -e 's|^/dev/[a-z]\+[1-9]\+ / \(ext3\) .*$|\1|p' /proc/mounts)"
+ROOT_FS_TYPE="$(sed -n -e 's|^/dev/mapper/pve-root\+ / \(ext3\) .*$|\1|p' /proc/mounts)"
 test "$ROOT_FS_TYPE" == ext3 || exit 100
 
 # Copy tune2fs to initrd
@@ -46,12 +46,16 @@ case "$1" in
         ;;
 esac
 
+/sbin/vgchange -ay
+/bin/ln -s /proc/mounts /etc/mtab
+ROOT="/dev/mapper/pve-root"
+
 /sbin/tune2fs -O extents,uninit_bg,dir_index -f "$ROOT" || echo "tune2fs: $?"
 EOF
 chmod +x /etc/initramfs-tools/scripts/init-premount/ext4
 
 # Change specified filesystem
-sed -i -e 's|\sext3\s| ext4 |' /etc/fstab
+sed -i -e '0,/ext3/s/ext3/ext4/' /etc/fstab
 
 # Regenerate initrd
 update-initramfs -v -u
