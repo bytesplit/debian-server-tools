@@ -56,7 +56,8 @@ ROOT="/dev/mapper/pve-root"
 # Size in filesystem blocks, usually 4 KB
 # tune2fs -l /dev/vda1
 # 1310720 blocks = 5 GB
-/sbin/resize2fs -d 8 "$ROOT" 1310720 || echo "resize2fs: $?"
+/sbin/resize2fs -d 8 "$ROOT" 5G || echo "resize2fs: $?"
+/sbin/lvm lvreduce -L 5G "$ROOT"
 EOF
 chmod +x /etc/initramfs-tools/scripts/init-premount/resize
 
